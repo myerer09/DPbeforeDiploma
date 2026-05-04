@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформлення замовлення | MPP</title>
+    <style>
+        :root { --bg: #011F28; --form: #324E59; --text: #E3DBD2; --sub: #7F888D; }
+        body { background: var(--bg); font-family: 'Segoe UI', sans-serif; color: var(--text); padding: 40px 20px; margin: 0; display: flex; justify-content: center; }
+        .wrapper { width: 100%; max-width: 600px; }
+        
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--form); padding-bottom: 20px; margin-bottom: 30px; }
+        .card { background: var(--form); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        label { display: block; margin-bottom: 6px; color: var(--sub); font-size: 0.85em; text-transform: uppercase; font-weight: bold; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 8px; border: none; background: #E3DBD2; box-sizing: border-box; font-size: 1em; color: #011F28; outline: none; }
+        input:focus, select:focus { box-shadow: 0 0 5px rgba(227, 219, 210, 0.5); }
+        
+        .btn { background: #000; color: #fff; padding: 16px; border: 1px solid var(--sub); border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; width: 100%; text-transform: uppercase; font-size: 1em; margin-top: 10px; }
+        .btn:hover { background: var(--text); color: #000; }
+        
+        .order-summary { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 25px; border: 1px dashed var(--sub); }
+        .order-summary p { margin: 5px 0; display: flex; justify-content: space-between; }
+        .total-sum { font-size: 1.2em; font-weight: bold; color: #fff; border-top: 1px solid var(--sub); padding-top: 10px; margin-top: 10px !important; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <h1 style="margin: 0;">Оформлення</h1>
+            <a href="/dashboard.html" style="color:var(--text); text-decoration:none; display: flex; align-items: center;">← Назад у кошик</a>
+        </div>
+
+        <div class="card">
+            <div class="order-summary">
+                <p>Кількість товарів: <span id="itemCount">0</span></p>
+                <p class="total-sum">До оплати: <span id="checkoutTotal">0 грн</span></p>
+            </div>
+
+            <form id="checkoutOrderForm">
+                <label>ПІБ отримувача</label>
+                <input type="text" id="cName" placeholder="Іванов Іван Іванович" required>
+
+                <label>Номер телефону</label>
+                <input type="tel" id="cPhone" placeholder="+380 99 000 00 00" required>
+
+                <label>Місто та відділення Нової Пошти</label>
+                <input type="text" id="cAddress" placeholder="м. Київ, відд. №15" required>
+
+                <label>Спосіб оплати</label>
+                <select id="cPayment" required>
+                    <option value="Накладений платіж">При отриманні (Накладений платіж)</option>
+                    <option value="Оплата на картку">Повна оплата на картку майстра</option>
+                </select>
+
+                <button type="submit" class="btn">Підтвердити замовлення</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Перевірка авторизації
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'buyer') {
+            window.location.href = '/';
+        }
+
+        // Завантаження даних кошика
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (cart.length === 0) {
+            alert("Ваш кошик порожній!");
+            window.location.href = '/dashboard.html';
+        }
+
+        // Підрахунок суми
+        let total = 0;
+        cart.forEach(item => total += Number(item.price));
+        
+        document.getElementById('itemCount').innerText = cart.length + ' шт.';
+        document.getElementById('checkoutTotal').innerText = total + ' грн';
+
+        // Обробка форми замовлення
+        document.getElementById('checkoutOrderForm').onsubmit = (e) => {
+            e.preventDefault();
+            
+            // Тут можна додати fetch-запит на сервер для збереження замовлення в БД
+            // Але зараз ми просто імітуємо успішне створення
+
+            alert("Замовлення успішно оформлено!\nНайближчим часом з вами зв'яжеться майстер.");
+            
+            // Очищуємо кошик після покупки
+            localStorage.removeItem('cart');
+            
+            // Перекидаємо на головну сторінку
+            window.location.href = '/';
+        };
+    </script>
+</body>
+</html>

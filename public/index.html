@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPP HANDMADE | Головна</title>
+    <style>
+        :root {
+            --bg-color: #011F28; --card-bg: #324E59; --input-bg: #E3DBD2;
+            --text-dark: #011F28; --text-light: #E3DBD2; --sub-color: #7F888D;
+            --accent: #000201; --error-color: #ff6b6b;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-light); margin: 0; min-height: 100vh; overflow-x: hidden; }
+        .circles-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .circle { position: absolute; border-radius: 50%; }
+        
+        header { background-color: var(--accent); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.4em; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; color: var(--text-light); }
+        .nav-auth { display: flex; align-items: center; gap: 20px; }
+        .nav-auth a { color: var(--text-light); text-decoration: none; font-size: 0.9em; text-transform: uppercase; transition: 0.3s; }
+        .nav-auth a:hover { color: var(--sub-color); }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--card-bg); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em; border: 2px solid var(--sub-color); color: var(--text-light); text-transform: uppercase;}
+        
+        .cart-icon { position: relative; cursor: pointer; font-size: 1.5em; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -10px; background-color: var(--error-color); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.6em; font-weight: bold; }
+
+        .main-layout { display: grid; grid-template-columns: 250px 1fr; gap: 40px; padding: 40px 50px; max-width: 1400px; margin: 0 auto; }
+        .sidebar { background-color: rgba(50, 78, 89, 0.8); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; height: fit-content; border: 1px solid rgba(227, 219, 210, 0.1); }
+        .sidebar h3 { font-size: 0.8em; color: var(--sub-color); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; }
+        .cat-item { display: block; padding: 12px 0; color: var(--text-light); text-decoration: none; cursor: pointer; border-bottom: 1px solid rgba(127, 136, 141, 0.2); }
+        .cat-item.active { font-weight: bold; color: #fff; border-left: 3px solid var(--text-light); padding-left: 10px; border-bottom: none; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .product-card { background-color: var(--card-bg); border-radius: 20px; padding: 15px; border: 1px solid rgba(227, 219, 210, 0.1); display: flex; flex-direction: column; }
+        .product-img { width: 100%; height: 180px; background-color: var(--accent); border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: var(--sub-color); }
+        .product-name { font-size: 1.1em; margin-bottom: 8px; }
+        .product-price { font-size: 1.3em; font-weight: bold; margin-bottom: 15px; }
+        .btn-buy { background-color: var(--accent); color: var(--text-light); border: 1px solid var(--sub-color); padding: 12px; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn-buy:hover { background-color: var(--text-light); color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="circles-bg" id="bgArea"></div>
+
+    <header>
+        <a href="/" class="logo">MPP HANDMADE</a>
+        <div class="nav-auth" id="authNav">
+            </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <h3>Категорії</h3>
+            <div class="cat-item active" onclick="filterCategory('Всі', this)">Всі товари</div>
+            <div class="cat-item" onclick="filterCategory('Одяг', this)">Одяг</div>
+            <div class="cat-item" onclick="filterCategory('Посуд', this)">Посуд</div>
+            <div class="cat-item" onclick="filterCategory('Аксесуари', this)">Аксесуари</div>
+            <div class="cat-item" onclick="filterCategory('Декор', this)">Декор</div>
+        </aside>
+
+        <main>
+            <h1 id="pageTitle" style="font-weight: 300;">Каталог виробів</h1>
+            <div class="product-grid" id="productGrid"></div>
+        </main>
+    </div>
+
+    <script>
+        const bg = document.getElementById('bgArea');
+        const colors = ['rgba(50,78,89,0.4)', 'rgba(0,2,1,0.5)', 'rgba(127,136,141,0.2)'];
+        for(let i=0; i<30; i++) {
+            const c = document.createElement('div'); c.className = 'circle';
+            const size = Math.random() * 250 + 20;
+            c.style.width = size + 'px'; c.style.height = size + 'px';
+            c.style.left = Math.random() * 100 + '%'; c.style.top = Math.random() * 100 + '%';
+            c.style.background = colors[Math.floor(Math.random()*colors.length)];
+            bg.appendChild(c);
+        }
+
+        // Логіка шапки та кошика
+        function updateNav() {
+            const userStr = localStorage.getItem('user');
+            const nav = document.getElementById('authNav');
+            
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const firstLetter = user.username.charAt(0);
+                
+                let cartHTML = '';
+                if (user.role === 'buyer') {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    cartHTML = `<a href="/dashboard.html" class="cart-icon">🛒<span class="cart-badge" id="cartCount">${cart.length}</span></a>`;
+                }
+
+                nav.innerHTML = `
+                    ${cartHTML}
+                    <a href="/dashboard.html" class="user-profile">
+                        <div class="avatar">${firstLetter}</div>
+                        <span>${user.username}</span>
+                    </a>
+                    <a href="#" onclick="logout()" style="color: var(--error-color); margin-left: 15px;">Вихід</a>
+                `;
+            } else {
+                nav.innerHTML = `<a href="/login.html">Вхід</a><a href="/register.html" style="border: 1px solid var(--sub-color); padding: 8px 15px; border-radius: 8px;">Реєстрація</a>`;
+            }
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+
+        // Додавання в кошик
+        function addToCart(id, name, price) {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) return window.location.href = '/login.html';
+            
+            const user = JSON.parse(userStr);
+            if (user.role === 'seller') return alert('Майстри не можуть купувати товари');
+
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.push({ id, name, price });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            updateNav();
+            alert(`Товар "${name}" додано у кошик!`);
+        }
+
+        // Завантаження товарів
+        async function fetchProducts(category = 'Всі') {
+            const grid = document.getElementById('productGrid');
+            const url = category === 'Всі' ? '/api/products' : `/api/products?category=${category}`;
+            try {
+                const response = await fetch(url);
+                const products = await response.json();
+                
+                const userStr = localStorage.getItem('user');
+                let isSeller = false;
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    isSeller = user.role === 'seller';
+                }
+
+                grid.innerHTML = products.map(p => {
+                    const imgHTML = p.image_url 
+                        ? `<img src="${p.image_url}" class="product-img" style="object-fit: cover;">`
+                        : `<div class="product-img">Без фото</div>`;
+                    
+                    const actionHTML = isSeller 
+                        ? `<div style="text-align:center; padding: 12px; color: var(--sub-color); font-size: 0.8em; text-transform: uppercase;">Вітрина</div>`
+                        : `<button class="btn-buy" onclick="addToCart(${p.id}, '${p.name}', ${p.price})">Купити</button>`;
+
+                    return `
+                    <div class="product-card">
+                        ${imgHTML}
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">${p.price} грн</div>
+                        ${actionHTML}
+                    </div>
+                `}).join('');
+            } catch (err) { grid.innerHTML = '<p>Не вдалося завантажити товари</p>'; }
+        }
+
+        function filterCategory(cat, el) {
+            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('pageTitle').innerText = cat === 'Всі' ? 'Каталог виробів' : cat;
+            fetchProducts(cat);
+        }
+
+        updateNav();
+        fetchProducts();
+    </script>
+</body>
+</html>
